@@ -1,7 +1,5 @@
-google-generativeai==0.3.2
-protobuf==4.25.3  # Updated to meet the mediapipe requirement
 streamlit==1.32.0
 opencv-python-headless==4.9.0.80
 numpy==1.26.4
-mediapipe==0.10.20
-tflite-runtime==2.16.0  # Now compatible with Python 3.11
+tensorflow==2.16.1
+google-generativeai==0.3.2
