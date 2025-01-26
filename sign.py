@@ -13,8 +13,8 @@ import google.generativeai as genai
 import time
 import textwrap
 
-# Configuration
-MODEL_PATH = "sign_language_model.h5"
+# Configuration - CHANGED TO TFLITE
+MODEL_PATH = "sign_language_model.tflite"
 GEMINI_API_KEY = "AIzaSyA-9-lTQTWdNM43YdOXMQwGKDy0SrMwo6c"
 CATEGORIES = ['1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G',
               'H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']
@@ -29,8 +29,11 @@ hands = mp_hands.Hands(static_image_mode=False,
                        max_num_hands=2,
                        min_detection_confidence=0.5)
 
-# Load trained model
-model = tf.keras.models.load_model(MODEL_PATH)
+# Load TFLite model - CHANGED SECTION
+interpreter = tf.lite.Interpreter(model_path=MODEL_PATH)
+interpreter.allocate_tensors()
+input_details = interpreter.get_input_details()
+output_details = interpreter.get_output_details()
 
 # Streamlit page configuration
 st.set_page_config(page_title="Indian Sign Language Translator", layout="wide")
@@ -86,10 +89,16 @@ def process_frame(frame):
             if hand_image.size == 0:
                 continue
                 
+            # Preprocess for TFLite
             processed_image = cv2.resize(hand_image, (64, 64))
             processed_image = cv2.cvtColor(processed_image, cv2.COLOR_BGR2RGB)
-            processed_image = processed_image / 255.0
-            pred = model.predict(np.expand_dims(processed_image, axis=0), verbose=0)[0]
+            processed_image = processed_image.astype(np.float32) / 255.0
+            processed_image = np.expand_dims(processed_image, axis=0)
+
+            # TFLite inference
+            interpreter.set_tensor(input_details[0]['index'], processed_image)
+            interpreter.invoke()
+            pred = interpreter.get_tensor(output_details[0]['index'])[0]
             
             pred_class = CATEGORIES[np.argmax(pred)]
             confidence = np.max(pred)
@@ -165,4 +174,3 @@ if st.session_state.running and camera is not None:
         st.session_state.gemini_text = get_gemini_response(' '.join(st.session_state.buffer))
         st.session_state.last_update = time.time()
         explanation.markdown(st.session_state.gemini_text)
-
