@@ -1,7 +1,7 @@
-streamlit==1.32.0
-opencv-python-headless==4.9.0.80
-numpy==1.26.4
-mediapipe==0.10.11
-tflite-runtime==2.16.0  # Instead of full tensorflow
-google-generativeai==0.3.2
-protobuf==3.20.3
+streamlit==1.32.0  # Compatible version for Streamlit
+opencv-python-headless==4.9.0.80  # Compatible OpenCV version
+numpy==1.26.4  # Latest compatible version of numpy
+mediapipe==0.10.11  # Compatible version of mediapipe
+tflite-runtime==2.16.0  # For TensorFlow Lite without full TensorFlow
+google-generativeai==0.3.2  # Gemini API client
+protobuf==3.20.3  # Compatible protobuf version
